@@ -1,0 +1,15 @@
+{
+    "name": "emntco/wp-spaces",
+    "description": "Offloads media uploads to DigitalOcean Spaces.",
+    "type": "project",
+    "require": {
+        "aws/aws-sdk-php": "^3.324"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "emnt.co"
+        }
+    ],
+    "minimum-stability": "stable"
+}
