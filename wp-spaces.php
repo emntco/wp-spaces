@@ -17,20 +17,20 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 } else {
     // Include admin notices for missing dependencies
-    require_once __DIR__ . '/includes/admin/notices.php';
+    require_once __DIR__ . '/admin/notices.php';
     add_action('admin_notices', 'wp_spaces_missing_dependencies_notice');
     return;
 }
 
 // Register activation and deactivation hooks
-require_once __DIR__ . '/includes/core/functions.php';
+require_once __DIR__ . '/core/functions.php';
 register_activation_hook(__FILE__, 'wp_spaces_activate');
 register_deactivation_hook(__FILE__, 'wp_spaces_deactivate');
 
 // Include core initialization file
-require_once __DIR__ . '/includes/core/init.php';
+require_once __DIR__ . '/core/init.php';
 
 // Include admin menu and settings
-require_once __DIR__ . '/includes/admin/menu.php';
-require_once __DIR__ . '/includes/admin/settings.php';
-require_once __DIR__ . '/includes/admin/actions.php';
+require_once __DIR__ . '/admin/menu.php';
+require_once __DIR__ . '/admin/settings.php';
+require_once __DIR__ . '/admin/actions.php';
