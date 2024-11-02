@@ -1,4 +1,16 @@
 <?php
+/**
+ * Synchronization Handler
+ * 
+ * Manages the synchronization process between local WordPress media library
+ * and DigitalOcean Spaces. Handles batch processing and progress tracking
+ * for large media libraries.
+ * 
+ * @package WordPress_Spaces
+ * @subpackage Sync
+ * @since 0.6
+ */
+
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
@@ -10,7 +22,15 @@ require_once __DIR__ . '/../utils/helpers.php';
 require_once __DIR__ . '/../core/aws-client.php';
 require_once __DIR__ . '/../core/functions.php';
 
-// Start Synchronization
+/**
+ * Initiates the synchronization process from local to Spaces.
+ * 
+ * Sets up the initial synchronization state by counting total attachments,
+ * storing progress metrics, and scheduling the batch processing events.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_start_sync() {
     wp_spaces_log_error('Starting sync process');
     
@@ -37,7 +57,16 @@ function wp_spaces_start_sync() {
     }
 }
 
-// Process Synchronization Batch
+/**
+ * Processes a batch of media files for synchronization.
+ * 
+ * Handles the upload of a subset of media files to DigitalOcean Spaces,
+ * including their various sizes and metadata. Manages progress tracking
+ * and cleanup of local files after successful upload.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_process_sync_batch() {
     // Add debug logging
     wp_spaces_log_error('Starting sync batch process');

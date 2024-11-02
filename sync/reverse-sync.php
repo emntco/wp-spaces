@@ -1,4 +1,16 @@
 <?php
+/**
+ * Reverse Synchronization Handler
+ * 
+ * Manages the process of moving files from DigitalOcean Spaces back to the
+ * local WordPress media library. Handles batch processing, progress tracking,
+ * and cleanup of remote files after successful transfer.
+ * 
+ * @package WordPress_Spaces
+ * @subpackage Sync
+ * @since 0.6
+ */
+
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
@@ -9,7 +21,15 @@ require_once __DIR__ . '/../utils/logger.php';
 require_once __DIR__ . '/../utils/helpers.php';
 require_once __DIR__ . '/../core/aws-client.php';
 
-// Start Reverse Synchronization
+/**
+ * Initiates the reverse synchronization process.
+ * 
+ * Counts total files in DigitalOcean Spaces, sets up progress tracking,
+ * and schedules the batch processing events for reverse synchronization.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_start_reverse_sync() {
     $s3 = wp_spaces_get_s3_client();
     $options = get_option('wp_spaces_settings');
@@ -62,7 +82,16 @@ function wp_spaces_start_reverse_sync() {
     }
 }
 
-// Process Reverse Synchronization Batch
+/**
+ * Processes a batch of files for reverse synchronization.
+ * 
+ * Downloads files from DigitalOcean Spaces to the local WordPress
+ * media library, verifies successful transfer, and removes the
+ * remote copies. Handles progress tracking and error logging.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_process_reverse_sync_batch() {
     $s3 = wp_spaces_get_s3_client();
     if (!$s3) {
@@ -165,7 +194,17 @@ function wp_spaces_process_reverse_sync_batch() {
     }
 }
 
-// Helper function to track attachment locations
+/**
+ * Updates the location status of media attachments.
+ * 
+ * Tracks whether media files are stored locally or in DigitalOcean Spaces
+ * by updating post metadata for the corresponding attachment.
+ * 
+ * @since 0.6
+ * @param string $relative_path The relative path of the media file
+ * @param string $location The storage location ('local' or 'spaces')
+ * @return void
+ */
 function wp_spaces_update_attachment_location($relative_path, $location) {
     global $wpdb;
     

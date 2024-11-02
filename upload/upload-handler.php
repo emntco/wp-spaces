@@ -1,4 +1,15 @@
 <?php
+/**
+ * Upload Handler
+ * 
+ * Manages the upload process of media files to DigitalOcean Spaces,
+ * handling both initial file uploads and their associated metadata.
+ * 
+ * @package WordPress_Spaces
+ * @subpackage Upload
+ * @since 0.6
+ */
+
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
@@ -8,7 +19,17 @@ if (!defined('ABSPATH')) {
 require_once __DIR__ . '/../core/aws-client.php';
 require_once __DIR__ . '/../core/functions.php';
 
-// Handle File Uploads (New Media)
+/**
+ * Handles the upload of new media files to DigitalOcean Spaces.
+ * 
+ * Intercepts WordPress media uploads and processes them for storage in
+ * DigitalOcean Spaces. If successful, removes the local copy and updates
+ * the file URL to point to the Spaces location.
+ * 
+ * @since 0.6
+ * @param array $upload Upload file information
+ * @return array Modified upload information
+ */
 function wp_spaces_handle_upload($upload) {
     if (isset($upload['error']) && !empty($upload['error'])) {
         return $upload;
@@ -65,7 +86,18 @@ function wp_spaces_handle_upload($upload) {
     return $upload;
 }
 
-// Handle Attachment Metadata (New Media)
+/**
+ * Processes attachment metadata for uploaded media files.
+ * 
+ * Handles the upload of generated image sizes and their metadata to
+ * DigitalOcean Spaces. This includes the original image and all
+ * intermediate sizes created by WordPress.
+ * 
+ * @since 0.6
+ * @param array $metadata Attachment metadata
+ * @param int $attachment_id Attachment post ID
+ * @return array Original metadata
+ */
 function wp_spaces_handle_attachment_metadata($metadata, $attachment_id) {
     $s3 = wp_spaces_get_s3_client();
 

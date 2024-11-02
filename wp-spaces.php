@@ -3,7 +3,7 @@
 Plugin Name: WordPress Spaces
 Description: Offloads media uploads to DigitalOcean Spaces.
 Version: 0.6
-Author: emnt.co
+Author: zayadur
 Text Domain: wp-spaces
 */
 

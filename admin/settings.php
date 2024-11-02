@@ -1,10 +1,35 @@
 <?php
+/**
+ * Admin Settings Handler
+ * 
+ * Manages the WordPress Spaces settings page, including field registration,
+ * rendering, and validation. Handles configuration for DigitalOcean Spaces
+ * integration including credentials, region selection, and sync controls.
+ * 
+ * @package WordPress_Spaces
+ * @subpackage Admin
+ * @since 0.6
+ */
+
 // Exit if accessed directly
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Initialize settings
+/**
+ * Initializes all plugin settings and registers them with WordPress.
+ * 
+ * Creates the settings section and registers all setting fields including:
+ * - Access Key
+ * - Secret Key
+ * - Space Name
+ * - Region
+ * - CDN URL
+ * - Subfolder settings
+ * 
+ * @since 0.6
+ * @return void
+ */
 add_action('admin_init', 'wp_spaces_settings_init');
 function wp_spaces_settings_init() {
     register_setting('wpSpaces', 'wp_spaces_settings', 'wp_spaces_sanitize_settings');
@@ -80,7 +105,15 @@ function wp_spaces_settings_init() {
     );
 }
 
-// Settings Section Callback
+/**
+ * Renders the settings section description.
+ * 
+ * Provides user guidance for configuring DigitalOcean Spaces credentials
+ * and explains the sync functionality.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_section_callback() {
     echo '<p>' . __('Enter your DigitalOcean Spaces credentials and configuration settings below.', 'wp-spaces') . '</p>';
     echo '<p>' . __('Use the "Enable Sync" button to synchronize your media files with Spaces.', 'wp-spaces') . '</p>';
@@ -88,7 +121,15 @@ function wp_spaces_section_callback() {
 
 // Render Functions for Settings Fields
 
-// Access Key
+/**
+ * Renders the Access Key input field.
+ * 
+ * Handles both direct input and wp-config.php defined values,
+ * masking the key when defined in configuration.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_access_key_render() {
     $options = get_option('wp_spaces_settings');
     $access_key = defined('WP_SPACES_ACCESS_KEY') ? '**********' : (isset($options['access_key']) ? esc_attr($options['access_key']) : '');
@@ -100,7 +141,15 @@ function wp_spaces_access_key_render() {
     }
 }
 
-// Secret Key
+/**
+ * Renders the Secret Key input field.
+ * 
+ * Handles both direct input and wp-config.php defined values,
+ * masking the key when defined in configuration.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_secret_key_render() {
     $options = get_option('wp_spaces_settings');
     $secret_key = defined('WP_SPACES_SECRET_KEY') ? '**********' : (isset($options['secret_key']) ? esc_attr($options['secret_key']) : '');
@@ -112,7 +161,15 @@ function wp_spaces_secret_key_render() {
     }
 }
 
-// Space Name
+/**
+ * Renders the Space Name input field.
+ * 
+ * Allows users to specify their DigitalOcean Space name
+ * where media files will be stored.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_space_name_render() {
     $options = get_option('wp_spaces_settings');
     ?>
@@ -120,7 +177,15 @@ function wp_spaces_space_name_render() {
     <?php
 }
 
-// Region
+/**
+ * Renders the Region selection dropdown.
+ * 
+ * Provides a list of available DigitalOcean datacenter regions
+ * where Spaces can be created.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_region_render() {
     $options = get_option('wp_spaces_settings');
     ?>
@@ -145,7 +210,15 @@ function wp_spaces_region_render() {
     <?php
 }
 
-// CDN URL
+/**
+ * Renders the CDN URL input field.
+ * 
+ * Optional field for users who have configured a CDN
+ * for their Space. Accepts full URL including protocol.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_cdn_url_render() {
     $options = get_option('wp_spaces_settings');
     ?>
@@ -153,7 +226,22 @@ function wp_spaces_cdn_url_render() {
     <?php
 }
 
-// Sanitize Settings
+/**
+ * Sanitizes and validates all settings before saving.
+ * 
+ * Performs validation on:
+ * - Credentials (when not in wp-config.php)
+ * - Region selection against allowed values
+ * - URL formats for CDN
+ * - Subfolder configuration and permissions
+ * 
+ * Includes error handling for invalid inputs and
+ * permission checks for subfolder access.
+ * 
+ * @since 0.6
+ * @param array $input Raw input from the settings form
+ * @return array Sanitized settings array
+ */
 function wp_spaces_sanitize_settings($input) {
     $output = array();
     
@@ -214,7 +302,19 @@ function wp_spaces_sanitize_settings($input) {
     return $output;
 }
 
-// Settings Page
+/**
+ * Renders the main settings page.
+ * 
+ * Displays:
+ * - Configuration fields for DigitalOcean Spaces
+ * - Sync controls and progress indicators
+ * - Status messages and error notifications
+ * - Progress bar for active synchronization operations
+ * - JavaScript-powered live progress updates
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_options_page() {
     $options = get_option('wp_spaces_settings');
     ?>
@@ -332,7 +432,16 @@ function wp_spaces_options_page() {
 <?php
 }
 
-// Add render functions
+/**
+ * Renders the subfolder mode checkbox.
+ * 
+ * Allows users to enable storage of files in a specific
+ * subfolder within their Space. When enabled, shows
+ * additional configuration options.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_use_subfolder_render() {
     $options = get_option('wp_spaces_settings');
     ?>
@@ -344,6 +453,17 @@ function wp_spaces_use_subfolder_render() {
     <?php
 }
 
+/**
+ * Renders the subfolder name input field.
+ * 
+ * Provides an input for the subfolder name within the Space.
+ * Defaults to the site's hostname and is only active when
+ * subfolder mode is enabled. Includes validation for
+ * proper naming conventions.
+ * 
+ * @since 0.6
+ * @return void
+ */
 function wp_spaces_subfolder_name_render() {
     $options = get_option('wp_spaces_settings');
     $default_subfolder = parse_url(get_site_url(), PHP_URL_HOST);
@@ -352,12 +472,22 @@ function wp_spaces_subfolder_name_render() {
            value='<?php echo isset($options['subfolder_name']) ? esc_attr($options['subfolder_name']) : esc_attr($default_subfolder); ?>'
            <?php echo !isset($options['use_subfolder']) ? 'disabled' : ''; ?>>
     <p class="description">
-        <?php _e('Subfolder name (e.g., example.com). This will be locked to your IAM policy permissions.', 'wp-spaces'); ?>
+        <?php _e('Subfolder name (e.g., example.com) to organize your media files.', 'wp-spaces'); ?>
     </p>
     <?php
 }
 
-// Toggle the subfolder input based on the use_subfolder checkbox
+/**
+ * Adds JavaScript to handle dynamic form behavior.
+ * 
+ * Initializes jQuery handlers to:
+ * - Toggle the subfolder name input based on checkbox state
+ * - Manage input field states dynamically
+ * - Update UI elements based on user interactions
+ * 
+ * @since 0.6
+ * @return void
+ */
 add_action('admin_footer', 'wp_spaces_subfolder_scripts');
 function wp_spaces_subfolder_scripts() {
     ?>
